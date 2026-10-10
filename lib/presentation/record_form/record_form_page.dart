@@ -4,6 +4,7 @@ import 'package:favor_ledger/core/theme.dart';
 import 'package:favor_ledger/core/utils/money.dart';
 import 'package:favor_ledger/domain/direction.dart';
 import 'package:favor_ledger/presentation/widgets/app_backdrop.dart';
+import 'package:favor_ledger/presentation/widgets/app_date_picker.dart';
 import 'package:favor_ledger/presentation/widgets/soft_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -245,8 +246,8 @@ class _RecordFormPageState extends ConsumerState<RecordFormPage> {
   }
 
   Future<void> _pickDate() async {
-    final picked = await showDatePicker(
-      context: context,
+    final picked = await showAppDatePicker(
+      context,
       initialDate: _occurredAt,
       firstDate: DateTime(1990),
       lastDate: DateTime.now().add(const Duration(days: 365)),
