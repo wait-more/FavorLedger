@@ -234,27 +234,9 @@ class _RecordFormPageState extends ConsumerState<RecordFormPage> {
   }
 
   Future<void> _createPersonInline() async {
-    final controller = TextEditingController();
     final name = await showDialog<String>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('新建亲友'),
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-          decoration: const InputDecoration(labelText: '姓名'),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('取消'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, controller.text.trim()),
-            child: const Text('创建'),
-          ),
-        ],
-      ),
+      builder: (context) => const _CreatePersonDialog(),
     );
     if (name == null || name.isEmpty || !mounted) return;
     final person =
@@ -294,6 +276,107 @@ class _RecordFormPageState extends ConsumerState<RecordFormPage> {
     } finally {
       if (mounted) setState(() => _loading = false);
     }
+  }
+}
+
+class _CreatePersonDialog extends StatefulWidget {
+  const _CreatePersonDialog();
+
+  @override
+  State<_CreatePersonDialog> createState() => _CreatePersonDialogState();
+}
+
+class _CreatePersonDialogState extends State<_CreatePersonDialog> {
+  late final _controller = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _submit() {
+    if (!(_formKey.currentState?.validate() ?? false)) return;
+    Navigator.pop(context, _controller.text.trim());
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Dialog(
+      backgroundColor: Colors.white,
+      elevation: 0,
+      insetPadding: const EdgeInsets.symmetric(horizontal: 36),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(22, 24, 22, 18),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                '新建亲友',
+                style: theme.textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.ink,
+                  height: 1.25,
+                ),
+              ),
+              const SizedBox(height: 14),
+              TextFormField(
+                controller: _controller,
+                autofocus: true,
+                decoration: const InputDecoration(labelText: '姓名'),
+                textInputAction: TextInputAction.done,
+                validator: (v) {
+                  if (v == null || v.trim().isEmpty) return '请填写姓名';
+                  return null;
+                },
+                onFieldSubmitted: (_) => _submit(),
+              ),
+              const SizedBox(height: 22),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppColors.ink,
+                        backgroundColor: AppColors.mist,
+                        side: const BorderSide(color: Color(0x330F5C4C)),
+                        minimumSize: const Size.fromHeight(46),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                      ),
+                      child: const Text('取消'),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: FilledButton(
+                      onPressed: _submit,
+                      style: FilledButton.styleFrom(
+                        backgroundColor: AppColors.jade,
+                        foregroundColor: Colors.white,
+                        minimumSize: const Size.fromHeight(46),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                      ),
+                      child: const Text('创建'),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
 
