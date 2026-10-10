@@ -13,6 +13,16 @@
 - **导出**：JSON、CSV
 - 有实质变更或失败时轻提示；设置「关于」可打开仓库页
 
+## 应用截图
+
+| 人情录 | 亲友详情 | 记一笔 |
+| :---: | :---: | :---: |
+| ![人情录](docs/screenshots/home.png) | ![亲友详情](docs/screenshots/detail.png) | ![记一笔](docs/screenshots/record.png) |
+
+| 流水 | 汇总 | 云端同步 |
+| :---: | :---: | :---: |
+| ![流水](docs/screenshots/flow.png) | ![汇总](docs/screenshots/stats.png) | ![云端同步](docs/screenshots/sync.png) |
+
 ## 开发
 
 网络访问 Google 较慢时可先设镜像（当前会话）：
