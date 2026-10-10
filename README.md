@@ -15,11 +15,20 @@
 
 ## 开发
 
+网络访问 Google 较慢时可先设镜像（当前会话）：
+
+```powershell
+$env:PUB_HOSTED_URL = "https://pub.flutter-io.cn"
+$env:FLUTTER_STORAGE_BASE_URL = "https://storage.flutter-io.cn"
+```
+
 ```bash
 flutter pub get
 dart run build_runner build --delete-conflicting-outputs
 flutter run
 ```
+
+Android Gradle 已默认优先走阿里云 / Flutter 中国镜像。
 
 ## 打包
 

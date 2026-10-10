@@ -411,6 +411,14 @@ class _SyncSettingsPageState extends ConsumerState<SyncSettingsPage> {
       if (!mounted) return;
       setState(() => _autoSync = true);
       await store.saveWebDav(_currentSettings());
+      // 开启后立刻同步一次，不必等启动/改账/定时
+      try {
+        await ref.read(syncHubProvider.notifier).syncNow(
+              trigger: SyncTrigger.auto,
+            );
+      } catch (_) {
+        // SyncHub 已 toast；开关保持开启
+      }
     } catch (e) {
       if (mounted) setState(() => _autoSync = false);
       _toast(friendlySyncError(e), error: true);
