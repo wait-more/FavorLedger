@@ -5,6 +5,7 @@ import 'package:favor_ledger/core/utils/money.dart';
 import 'package:favor_ledger/domain/direction.dart';
 import 'package:favor_ledger/presentation/widgets/app_backdrop.dart';
 import 'package:favor_ledger/presentation/widgets/app_date_picker.dart';
+import 'package:favor_ledger/presentation/widgets/person_picker_field.dart';
 import 'package:favor_ledger/presentation/widgets/soft_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -90,24 +91,17 @@ class _RecordFormPageState extends ConsumerState<RecordFormPage> {
                               const LinearProgressIndicator(minHeight: 2),
                           error: (e, _) => Text('加载亲友失败：$e'),
                           data: (people) {
+                            final selected = people.any((p) => p.id == _personId)
+                                ? _personId
+                                : null;
                             return Row(
                               children: [
                                 Expanded(
-                                  child: DropdownButtonFormField<String>(
-                                    // ignore: deprecated_member_use
-                                    value: people.any((p) => p.id == _personId)
-                                        ? _personId
-                                        : null,
-                                    decoration:
-                                        const InputDecoration(labelText: '亲友'),
-                                    items: people
-                                        .map(
-                                          (p) => DropdownMenuItem(
-                                            value: p.id,
-                                            child: Text(p.name),
-                                          ),
-                                        )
-                                        .toList(),
+                                  child: PersonPickerField(
+                                    people: people,
+                                    value: selected,
+                                    labelText: '亲友',
+                                    hintText: '选择亲友',
                                     onChanged: (v) =>
                                         setState(() => _personId = v),
                                     validator: (v) => v == null || v.isEmpty

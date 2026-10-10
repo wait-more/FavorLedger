@@ -1,11 +1,11 @@
 import 'package:favor_ledger/application/providers.dart';
 import 'package:favor_ledger/application/refresh_ledger.dart';
-import 'package:favor_ledger/core/theme.dart';
 import 'package:favor_ledger/domain/direction.dart';
 import 'package:favor_ledger/presentation/widgets/app_backdrop.dart';
 import 'package:favor_ledger/presentation/widgets/confirm_dialog.dart';
 import 'package:favor_ledger/presentation/widgets/empty_state.dart';
 import 'package:favor_ledger/presentation/widgets/filter_bar.dart';
+import 'package:favor_ledger/presentation/widgets/person_picker_field.dart';
 import 'package:favor_ledger/presentation/widgets/pull_refresh.dart';
 import 'package:favor_ledger/presentation/widgets/record_tile.dart';
 import 'package:flutter/material.dart';
@@ -62,20 +62,14 @@ class _FlowPageState extends ConsumerState<FlowPage> {
               data: (people) {
                 return Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: DropdownButtonFormField<String?>(
-                    // ignore: deprecated_member_use
+                  child: PersonPickerField(
+                    people: people,
                     value: _personId,
-                    decoration: const InputDecoration(
-                      labelText: '按亲友筛选',
-                      isDense: true,
-                    ),
-                    items: [
-                      const DropdownMenuItem(value: null, child: Text('全部亲友')),
-                      ...people.map(
-                        (p) =>
-                            DropdownMenuItem(value: p.id, child: Text(p.name)),
-                      ),
-                    ],
+                    labelText: '按亲友筛选',
+                    hintText: '选择亲友',
+                    allowClear: true,
+                    clearLabel: '全部亲友',
+                    isDense: true,
                     onChanged: (v) => setState(() => _personId = v),
                   ),
                 );
