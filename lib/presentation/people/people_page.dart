@@ -203,6 +203,7 @@ class _PersonTile extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final latest = summary.latestRecord;
+    final note = summary.person.note.trim();
     String subtitle = '暂无往来';
     if (latest != null) {
       final dir = FavorDirection.fromCode(latest.direction).label;
@@ -250,9 +251,24 @@ class _PersonTile extends ConsumerWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          summary.person.name,
-                          style: theme.textTheme.titleMedium,
+                        Text.rich(
+                          TextSpan(
+                            style: theme.textTheme.titleMedium,
+                            children: [
+                              TextSpan(text: summary.person.name),
+                              if (note.isNotEmpty)
+                                TextSpan(
+                                  text: '  $note',
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                    color: AppColors.inkMuted,
+                                    fontWeight: FontWeight.w400,
+                                    height: 1.2,
+                                  ),
+                                ),
+                            ],
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                         const SizedBox(height: 3),
                         Text(

@@ -93,8 +93,8 @@ final activeRecordsProvider = StreamProvider<List<FavorRecord>>((ref) {
   return ref.watch(databaseProvider).watchActiveRecords();
 });
 
-final personProvider = FutureProvider.family<Person?, String>((ref, id) {
-  return ref.watch(databaseProvider).getPerson(id);
+final personProvider = StreamProvider.family<Person?, String>((ref, id) {
+  return ref.watch(databaseProvider).watchPerson(id);
 });
 
 final personRecordsProvider =

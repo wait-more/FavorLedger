@@ -90,6 +90,12 @@ class AppDatabase extends _$AppDatabase {
     return (select(persons)..where((t) => t.id.equals(id))).getSingleOrNull();
   }
 
+  Stream<Person?> watchPerson(String id) {
+    return (select(persons)..where((t) => t.id.equals(id)))
+        .watch()
+        .map((rows) => rows.isEmpty ? null : rows.first);
+  }
+
   Future<void> upsertPerson(PersonsCompanion companion) {
     return into(persons).insertOnConflictUpdate(companion);
   }

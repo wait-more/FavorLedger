@@ -76,6 +76,7 @@ class _PersonDetailPageState extends ConsumerState<PersonDetailPage> {
                 Padding(
                   padding: const EdgeInsets.fromLTRB(20, 4, 20, 8),
                   child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       PersonAvatar(name: person.name, size: 56),
                       const SizedBox(width: 14),
@@ -87,13 +88,17 @@ class _PersonDetailPageState extends ConsumerState<PersonDetailPage> {
                               person.name,
                               style: Theme.of(context).textTheme.headlineSmall,
                             ),
-                            if (person.note.isNotEmpty) ...[
-                              const SizedBox(height: 4),
+                            if (person.note.trim().isNotEmpty) ...[
+                              const SizedBox(height: 6),
                               Text(
-                                person.note,
-                                style: Theme.of(context).textTheme.bodySmall,
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
+                                person.note.trim(),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium
+                                    ?.copyWith(
+                                      color: AppColors.inkMuted,
+                                      height: 1.45,
+                                    ),
                               ),
                             ],
                           ],
