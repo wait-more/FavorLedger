@@ -6,6 +6,7 @@ import 'package:favor_ledger/domain/direction.dart';
 import 'package:favor_ledger/domain/person_summary.dart';
 import 'package:favor_ledger/presentation/widgets/amount_text.dart';
 import 'package:favor_ledger/presentation/widgets/app_backdrop.dart';
+import 'package:favor_ledger/presentation/widgets/confirm_dialog.dart';
 import 'package:favor_ledger/presentation/widgets/empty_state.dart';
 import 'package:favor_ledger/presentation/widgets/person_avatar.dart';
 import 'package:favor_ledger/presentation/widgets/pull_refresh.dart';
@@ -181,13 +182,25 @@ class _PeopleList extends StatelessWidget {
   }
 }
 
-class _PersonTile extends StatelessWidget {
+class _PersonTile extends ConsumerWidget {
   const _PersonTile({required this.summary});
 
   final PersonSummary summary;
 
+  Future<bool> _confirmDelete(BuildContext context) {
+    return showConfirmDialog(
+      context,
+      title: '删除亲友',
+      content: '确定删除「${summary.person.name}」及其全部往来记录？',
+    );
+  }
+
+  Future<void> _delete(WidgetRef ref) {
+    return ref.read(ledgerActionsProvider).deletePerson(summary.person.id);
+  }
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final latest = summary.latestRecord;
     String subtitle = '暂无往来';
@@ -198,60 +211,85 @@ class _PersonTile extends StatelessWidget {
       subtitle = '$date · $event · $dir';
     }
 
+    final error = theme.colorScheme.error;
+    final radius = BorderRadius.circular(16);
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      child: Material(
-        color: Colors.white.withValues(alpha: 0.62),
-        borderRadius: BorderRadius.circular(16),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(16),
-          onTap: () => context.push('/person/${summary.person.id}'),
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
-            child: Row(
-              children: [
-                PersonAvatar(name: summary.person.name),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+      child: Dismissible(
+        key: ValueKey(summary.person.id),
+        direction: DismissDirection.startToEnd,
+        confirmDismiss: (_) => _confirmDelete(context),
+        onDismissed: (_) => _delete(ref),
+        background: ClipRRect(
+          borderRadius: radius,
+          child: ColoredBox(
+            color: error,
+            child: const Align(
+              alignment: Alignment.centerLeft,
+              child: Padding(
+                padding: EdgeInsets.only(left: 24),
+                child: Icon(Icons.delete_outline_rounded, color: Colors.white),
+              ),
+            ),
+          ),
+        ),
+        child: Material(
+          color: Colors.white.withValues(alpha: 0.62),
+          borderRadius: radius,
+          child: InkWell(
+            borderRadius: radius,
+            onTap: () => context.push('/person/${summary.person.id}'),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+              child: Row(
+                children: [
+                  PersonAvatar(name: summary.person.name),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          summary.person.name,
+                          style: theme.textTheme.titleMedium,
+                        ),
+                        const SizedBox(height: 3),
+                        Text(
+                          subtitle,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: theme.textTheme.bodySmall,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      Text(summary.person.name, style: theme.textTheme.titleMedium),
-                      const SizedBox(height: 3),
+                      if (!summary.hasActivity)
+                        Text(
+                          '—',
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            color: AppColors.inkMuted,
+                          ),
+                        )
+                      else
+                        AmountText(
+                          // 收到−送出：入超 +，出超 −
+                          cents: summary.netCents,
+                          signed: true,
+                          compact: true,
+                        ),
                       Text(
-                        subtitle,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: theme.textTheme.bodySmall,
+                        summary.balanceLabel,
+                        style: theme.textTheme.labelSmall,
                       ),
                     ],
                   ),
-                ),
-                const SizedBox(width: 8),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    if (!summary.hasActivity)
-                      Text(
-                        '—',
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          color: AppColors.inkMuted,
-                        ),
-                      )
-                    else
-                      AmountText(
-                        // 收到−送出：入超 +，出超 −
-                        cents: summary.netCents,
-                        signed: true,
-                        compact: true,
-                      ),
-                    Text(
-                      summary.balanceLabel,
-                      style: theme.textTheme.labelSmall,
-                    ),
-                  ],
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
